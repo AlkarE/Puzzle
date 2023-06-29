@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vite App</title>
+</head>
+
+<body>
+  <div id="app">
+    <header class="app-header">
+      <div class="container navbar-container">
+
+        <nav class="navbar">
+          <div class="hamburger-lines" id="navbar-trigger">
+            <span class="line line1"></span>
+            <span class="line line2"></span>
+            <span class="line line3"></span>
+          </div>
+
+
+          <ul class="menu-items">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Category</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </nav>
+        <div class="top-bar">
+          <div class="control" id="control">
+            <button class="btn crop" data-action="toggle">
+              <svg class="" id="" width="512" height="512" viewBox="0 0 512 512">
+                <use id="theUse" xlink:href="#heart"></use>
+              </svg>
+            </button>
+            <button class="btn stop" data-action="stop"><svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"
+                viewBox="0 0 512 512">
+                <path fill="currentColor"
+                  d="M416 464H96a48.05 48.05 0 0 1-48-48V96a48.05 48.05 0 0 1 48-48h320a48.05 48.05 0 0 1 48 48v320a48.05 48.05 0 0 1-48 48Z" />
+              </svg></button>
+          </div>
+          <h1 class="logo">Photo</h1>
+        </div>
+      </div>
+    </header>
+    <main class="main">
+      <div class="container">
+
+
+        <div class="image-area">
+
+          <img src="" id="image-src" alt="">
+        </div>
+        <div id="playBox" class="playbox bg">
+          <div class="box" id="imgLoader">
+            <input type="file" name="fileInput" id="fileInput" class="inputfile"
+              data-multiple-caption="{count} files selected" />
+            <label for="fileInput">
+              <figure>
+                <img src="./upload.png" alt="">
+              </figure>
+            </label>
+          </div>
+
+        </div>
+        <!-- <div class="upload">
+          <img src="" alt="">
+        </div> -->
+
+      </div>
+
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div id="counter" class="counter"></div>
+
+      </div>
+      <div class="container">
+        <h2 class="footer-logo">Puzzle</h2>
+      </div>
+      <div class="container">
+
+        <!-- <button id="crop">Crop</button>
+        <button id="start">Start</button>
+        <button id="stop">Stop</button> -->
+      </div>
+    </footer>
+    <div class="">
+      <svg width="0" height="0" display="none">
+        <defs>
+          <symbol width="512" height="512" viewBox="0 0 512 512" id="play" style="overflow: visible">
+            <path fill="currentColor"
+              d="M133,440a35.37,35.37,0,0,1-17.5-4.67c-12-6.8-19.46-20-19.46-34.33V111c0-14.37,7.46-27.53,19.46-34.33a35.13,35.13,0,0,1,35.77.45L399.12,225.48a36,36,0,0,1,0,61L151.23,434.88A35.5,35.5,0,0,1,133,440Z" />
+          </symbol>
+
+          <symbol width="512" height="512" id="pause" viewBox="0 0 512 512" style="overflow: visible">
+            <title>heart</title>
+            <path fill="currentColor"
+              d="M208,432H160a16,16,0,0,1-16-16V96a16,16,0,0,1,16-16h48a16,16,0,0,1,16,16V416A16,16,0,0,1,208,432Z" />
+            <path fill="currentColor"
+              d="M352,432H304a16,16,0,0,1-16-16V96a16,16,0,0,1,16-16h48a16,16,0,0,1,16,16V416A16,16,0,0,1,352,432Z" />
+          </symbol>
+        </defs>
+      </svg>
+    </div>
+  </div>
+  <script type="module" src="/main.js"></script>
+</body>
+
+</html>

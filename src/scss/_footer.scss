@@ -1,0 +1,9 @@
+.footer {
+  z-index: 20;
+  &-logo {
+    color: var(--accent-color);
+    text-transform: uppercase;
+    text-align: center;
+    font-size: 2rem;
+  }
+}
