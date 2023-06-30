@@ -20,7 +20,7 @@ theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#play')
 let cropper, cropRatio = .8;
 let game;
 let boardWidth, boardHeight;
-let gridX = 3, gridY = 3
+let gridX = 3, gridY = 4
 // status:
 // 0 - created
 // 1 - image loaded

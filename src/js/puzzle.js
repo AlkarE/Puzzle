@@ -84,7 +84,7 @@ export class Puzzle {
 		let flag = true;
 		for (let i = 0; i < this.gridY; ++i) {
 			for (let j = 0; j < this.gridX; ++j) {
-				if ((this.gridX - 1) === i && (this.gridY - 1) === j) continue
+				if ((this.gridY - 1) === i && (this.gridX - 1) === j) continue
 				if (this.list[i][j].x != this.origin[i][j].x
 					|| this.list[i][j].y != this.origin[i][j].y
 					|| this.list[i][j].marker !== this.origin[i][j].marker) {
