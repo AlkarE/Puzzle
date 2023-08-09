@@ -26,7 +26,7 @@ export class Puzzle {
 	listener() {
 
 		this.box.addEventListener('click', (evt) => {
-			if (window.Pg.status !== 4) return
+			// if (window.Pg.status !== 4) return
 			let el = evt.target.parentElement.parentElement
 			if (el.classList.contains('item')) {
 				let from = this.findTile(+el.dataset.x, +el.dataset.y)
@@ -50,7 +50,7 @@ export class Puzzle {
 			}
 		})
 		this.box.addEventListener('touchend', (evt) => {
-			if (window.Pg.status !== 4) return
+			// if (window.Pg.status !== 4) return
 			let el = evt.target.parentElement
 			if (el.classList.contains('item')) {
 				let from = this.findTile(+el.dataset.x, +el.dataset.y)
@@ -73,30 +73,30 @@ export class Puzzle {
 				}
 			}
 		})
-		this.box.addEventListener('dragstart', (evt) => {
-			if (window.Pg.status !== 4) return
-			let el = evt.target.parentElement
-			if (el.classList.contains('item')) {
-				let from = this.findTile(+el.dataset.x, +el.dataset.y)
+		// this.box.addEventListener('dragstart', (evt) => {
+		// 	if (window.Pg.status !== 4) return
+		// 	let el = evt.target.parentElement
+		// 	if (el.classList.contains('item')) {
+		// 		let from = this.findTile(+el.dataset.x, +el.dataset.y)
 
-				if (this.canMove(from)) {
-					this.swap(from, true)
-				}
-				if (this.solved) {
-					setTimeout(() => {
-						const win = new CustomEvent('solved', {
-							detail: {
-								win: true,
-							},
-						})
+		// 		if (this.canMove(from)) {
+		// 			this.swap(from, true)
+		// 		}
+		// 		if (this.solved) {
+		// 			setTimeout(() => {
+		// 				const win = new CustomEvent('solved', {
+		// 					detail: {
+		// 						win: true,
+		// 					},
+		// 				})
 
-						this.clear()
-						this.showImage()
-						this.box.dispatchEvent(win)
-					}, 500);
-				}
-			}
-		})
+		// 				this.clear()
+		// 				this.showImage()
+		// 				this.box.dispatchEvent(win)
+		// 			}, 500);
+		// 		}
+		// 	}
+		// })
 
 
 	}

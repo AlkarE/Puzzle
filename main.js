@@ -22,12 +22,21 @@ let cropper, cropRatio = .8;
 let game;
 let boardWidth, boardHeight;
 let gridX = 3, gridY = 4
-// status:
+
+
+// statuses:
+const CREATED = 'CREATED'
+const IMAGELOADED = 'IMAGELOADED'
+const IMAGECROPPED = 'IMAGECROPPED'
+const GAMESTARTED = 'GAMESTARTED'
+const GAMEPAUSED = 'GAMEPAUSED'
+const GAMEFINISHED = 'GAMEFINISHED'
 // 0 - created
 // 1 - image loaded
 // 2 - image cropped
 // 3 - game started
 // 4 - game paused
+// 5 - game finished
 
 
 function loadImage() {
@@ -54,7 +63,7 @@ function loadImage() {
 				cropBoxResizable: false,
 				toggleDragModeOnDblclick: false,
 			})
-			Pg.status = 1
+			Pg.status = IMAGELOADED
 			handler()
 		}
 	}
@@ -137,7 +146,7 @@ function initPlaybox() {
 	Pg.ratio = boardWidth / boardHeight
 	board.style.width = boardWidth + 'px'
 
-	Pg.status = 0
+	Pg.status = CREATED
 }
 
 
@@ -200,7 +209,7 @@ function onCrop() {
 				game = new Puzzle(image, gridX, gridY)
 				Pg.game = game
 				game.init()
-
+				Pg.status = GAMESTARTED
 			}
 		};
 	});
@@ -221,32 +230,32 @@ function init() {
 
 function handler(action) {
 	// log('action: ', action)
-	// log('status: ', Pg.status)
+	log('status: ', Pg.status)
 	switch (Pg.status) {
-		case (0):
+		case (CREATED):
 			let btns = document.querySelectorAll('#control button')
 			Array.from(btns).forEach(btn => btn.style.display = 'none')
 			break;
 
-		case (1):
+		case (IMAGELOADED):
 			Pg.toggle.style.display = ''
-			Pg.status = 2
+			Pg.status =  IMAGECROPPED
 			break;
-		case (2):
+		case (IMAGECROPPED):
 			if(action === 'toggle') {
 				onCrop()	
-				Pg.status = 3	
+				
 			}
 			break;
-		case(3):
+		case(GAMESTARTED):
 			if(action === 'toggle') {
 				start()
 				theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#pause')
 				Pg.stop.style.display = ''
-				Pg.status = 4
+				// Pg.status = GAMEPAUSED
 			}
 		break;
-		case(4):
+		case(GAMEPAUSED):
 			if(action === 'toggle') {
 				
 				theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#play')
@@ -261,7 +270,7 @@ function handler(action) {
 				theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#pause')
 				Pg.counter.run()
 				unmask()
-				Pg.status = 4
+				Pg.status = GAMEPAUSED
 			}
 		break;
 
