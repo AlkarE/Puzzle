@@ -15,6 +15,7 @@
   "dependencies": {
     "@zellwk/javascript": "^4.0.0",
     "cropperjs": "^1.5.13",
+    "micromodal": "^0.4.10",
     "normalize-scss": "^7.0.1"
   }
 }

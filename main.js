@@ -4,6 +4,7 @@ import './src/scss/main.scss'
 
 import { Counter } from './src/js/counter.js'
 import Cropper from 'cropperjs'
+import MicroModal  from 'micromodal'
 // import * as localStore from '@zellwk/javascript/browser/local-store.js'
 import { Puzzle } from './src/js/puzzle.js'
 import { bodyHeight, bodyWidth, log, getElSizes } from './src/js/utils'
@@ -41,8 +42,6 @@ function loadImage() {
 		img.src = reader.result;
 		img.onload = function () {
 			hideLoader()
-			// console.log('boardHeight ', boardHeight)
-			// console.log('boardWidth ', boardWidth)
 			cropper = new Cropper(img, {
 				dragMode: 'move',
 				aspectRatio: Pg.ratio,
@@ -54,12 +53,6 @@ function loadImage() {
 				cropBoxMovable: false,
 				cropBoxResizable: false,
 				toggleDragModeOnDblclick: false,
-				// ready: function () {
-				// 	cropper.setCropBoxData({
-				// 		width: boardWidth * cropRatio ,
-				// 		height: boardHeight * cropRatio ,
-				// 	})
-				// }
 			})
 			Pg.status = 1
 			handler()
@@ -76,11 +69,36 @@ function hideLoader() {
 	document.getElementById('imgLoader').style.display = 'none'
 }
 
+function getColor(parts, i) {
+
+	/* 
+	* 
+	#0469ED
+	#0059CD
+	#0051BA
+	#004CAD
+	#0047A1
+	
+	*/ 
+	let prefix = '#'
+	let start = 0x0469ED
+	let end = 0x003270
+	let diff = start - end
+	let step = (Math.floor(diff / parts))
+	let color = (start + step * i).toString(16)
+	while(color.length < 6) {
+		color = '0' + color
+	}
+	color = prefix + color
+	return color
+}
+
+
 function initPlaybox() {
 	// counter/header height 32
 	// footer height 40
-
-	const safeHeight = 40 + 32 + 80
+	let startColor = 0x0469ED
+	const safeHeight = 40 + 32 + 120
 	// aspectRatio = gridX / gridY
 	const board = document.getElementById('playBox')
 	let requiredHeight = bodyHeight - safeHeight
@@ -88,8 +106,7 @@ function initPlaybox() {
 	if (bodyWidth <= 600) {
 		requiredWidth = bodyWidth - 32
 	}
-	// console.log(bodyHeight)
-	// console.log(bodyWidth)
+	
 	const item = {
 		height: Math.floor(requiredHeight / gridY),
 		width: Math.floor(requiredWidth / gridX)
@@ -97,13 +114,22 @@ function initPlaybox() {
 
 	for (let i = 0; i < gridX * gridY; i++) {
 		let el = document.createElement('div')
+		let inner = document.createElement('div')
+		inner.classList.add('inner')
+		el.append(inner)
+
 		el.classList.add('item')
+		let dummy = document.createElement('div')
+		dummy.classList.add('fill')
+		dummy.style.background = getColor(gridX * gridY, i)
+		inner.appendChild(dummy)
 		el.style.width = item.width + 'px'
 		el.style.height = item.height + 'px'
 		board.append(el)
 	}
-	boardWidth = (item.width + 2) * gridX
-	boardHeight = (item.height + 2) * gridY
+	// item border 3px
+	boardWidth = (item.width + 6) * gridX
+	boardHeight = (item.height + 6) * gridY
 
 	Pg.w = boardWidth
 	Pg.h = boardHeight
@@ -114,14 +140,6 @@ function initPlaybox() {
 	Pg.status = 0
 }
 
-// let a = document.getElementById('playBox')
-// let s = a.getBoundingClientRect()
-
-
-// localStore.set.get
-// localStore.set(token, '12345', {
-//   expiresIn: 3600,
-// })
 
 /**
  * user
@@ -136,6 +154,20 @@ function navbar() {
 	document.getElementById('navbar-trigger').addEventListener('click', (evt) => {
 		document.querySelector('.navbar').classList.toggle('is-open')
 	})
+}
+
+function mask() {
+	let layer = document.createElement('div')
+	layer.id= 'masked'
+	layer.classList.add('masked')
+	document.querySelector('#playBox').append(layer)
+}
+
+function unmask() {
+	let mask = document.getElementById('masked')
+	if(mask) {
+		mask.remove()
+	}
 }
 
 function loadLocal() {
@@ -161,8 +193,12 @@ function onCrop() {
 			cropper.destroy();
 			cropper = null;
 			image.onload = function () {
-
+				Pg.image = {
+					w: image.width,
+					h: image.height
+				}
 				game = new Puzzle(image, gridX, gridY)
+				Pg.game = game
 				game.init()
 
 			}
@@ -177,6 +213,9 @@ function init() {
 	eventFiller()
 	initPlaybox()
 	handler()
+	MicroModal .init({
+		openTrigger: 'data-custom-open',
+	});
 }
 
 
@@ -212,6 +251,7 @@ function handler(action) {
 				
 				theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#play')
 				Pg.counter.stop()
+				mask()
 				Pg.status = 5
 			}
 		break;
@@ -220,6 +260,7 @@ function handler(action) {
 				
 				theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#pause')
 				Pg.counter.run()
+				unmask()
 				Pg.status = 4
 			}
 		break;
@@ -249,6 +290,18 @@ function eventFiller() {
 	document.getElementById('playBox').addEventListener('solved', () => {
 		solved()
 	})
+
+	// mouse
+	document.getElementById('playBox').addEventListener('mousedown', (evt) => {
+		// log(evt)
+	})
+	document.addEventListener('click', (evt) => {
+
+		if(evt.id === 'masked') {
+			return
+		}
+	})
+
 }
 
 window.addEventListener('load', init)

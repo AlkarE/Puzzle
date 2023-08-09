@@ -3,8 +3,45 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  border: 1px solid #000;
+  // border: 1px solid #000;
   margin: 0 auto;
+  // box-shadow: 0 0 0px 1px rgba(255,255,255,.4);
+  .masked {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    cursor: not-allowed;
+    // opacity: .6;
+    background-color: var(--background-fill-color);
+    background-image:
+      repeating-linear-gradient(
+        to right,
+        var(--background-grid-color) 0,
+        var(--background-grid-color) 1px,
+        transparent 1px,
+        transparent 20px
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        var(--background-grid-color) 0,
+        var(--background-grid-color) 1px,
+        transparent 1px,
+        transparent 20px
+      )
+    ;
+
+    // background-image: radial-gradient(
+    // circle at center,
+    // rgba(0,0,0,.7) 0.2rem,
+    // transparent 0
+    // );
+    // background-size: 1rem 1rem;
+    // background-repeat: round;
+
+    // background: rgba(0,0,0,.25);
+  }
 }
 .bg {
   background-color: var(--main-bg-color);
@@ -14,13 +51,39 @@
   align-items: center;
   justify-content: center;
   font-size: 22px;
-  background-color: #0469ED;
-  border: 1px solid #000;
-  transition: all .3s;
-  // width: 33.3333%;
-  // height: 320px;
-}
-.item-empty {
-  // background-color: var(--main-bg-color);
+  position: relative;
+  will-change: transform;
+  box-shadow: 0 0 0 1px transparent;
+  
+  transition: box-shadow .3s ease;
+  
+  .fill {
+    height: 100%;
+    width: 100%;
+    background-color: #fff;
+  }
+ 
+  & .inner {
+    // border: 3px solid black;
+    background-color: gray;
+    width: calc(100% - 6px);
+    height: calc(100% - 6px);
+    // transition: box-shadow 0.4s ease;
 
+  }
+  canvas {
+    position: relative;
+    z-index: 11;
+  }
+}
+.item:not(.item-empty) {
+  cursor: pointer;
+}
+.item:not(.item-empty):not(.moved):hover {
+  // border-color: green;
+  box-shadow: inset 0 0 0 1px rgba(99, 255, 32, 0.85);
+}
+.moved {
+  transition: transform .25s ease;
+  z-index: 10;
 }

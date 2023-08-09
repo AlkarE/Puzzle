@@ -1,6 +1,8 @@
 export class Puzzle {
 
-	constructor(image, gridX, gridY) {
+	// default border width 3 
+	constructor(image, gridX, gridY, border = 3) {
+		this.border = border
 		this.dirty = false
 		this.image = image
 		this.list = []
@@ -10,25 +12,27 @@ export class Puzzle {
 		this.solved = false
 		this.width = image.width
 		this.height = image.height
-		this.partWidth = Math.floor(this.width / this.gridX)
-		this.partHeight = Math.floor(this.height / this.gridY)
+		this.partWidth = Math.floor(this.width / this.gridX) 
+		this.partHeight = Math.floor(this.height / this.gridY) 
 		this.box = document.getElementById("playBox")
 		this.listener()
+		window.Pg.list = this.list
 		window.Pg.createdItem = {
 			height: this.partHeight,
 			width: this.partWidth,
 		}
-		console.log('width ', this.width)
-		console.log('height ', this.height)
+
 	}
 	listener() {
+
 		this.box.addEventListener('click', (evt) => {
-			let el = evt.target.parentElement
+			if (window.Pg.status !== 4) return
+			let el = evt.target.parentElement.parentElement
 			if (el.classList.contains('item')) {
 				let from = this.findTile(+el.dataset.x, +el.dataset.y)
 
 				if (this.canMove(from)) {
-					this.swap(from)
+					this.swap(from, true)
 				}
 				if (this.solved) {
 					setTimeout(() => {
@@ -46,12 +50,37 @@ export class Puzzle {
 			}
 		})
 		this.box.addEventListener('touchend', (evt) => {
+			if (window.Pg.status !== 4) return
 			let el = evt.target.parentElement
 			if (el.classList.contains('item')) {
 				let from = this.findTile(+el.dataset.x, +el.dataset.y)
 
 				if (this.canMove(from)) {
-					this.swap(from)
+					this.swap(from, true)
+				}
+				if (this.solved) {
+					setTimeout(() => {
+						const win = new CustomEvent('solved', {
+							detail: {
+								win: true,
+							},
+						})
+
+						this.clear()
+						this.showImage()
+						this.box.dispatchEvent(win)
+					}, 500);
+				}
+			}
+		})
+		this.box.addEventListener('dragstart', (evt) => {
+			if (window.Pg.status !== 4) return
+			let el = evt.target.parentElement
+			if (el.classList.contains('item')) {
+				let from = this.findTile(+el.dataset.x, +el.dataset.y)
+
+				if (this.canMove(from)) {
+					this.swap(from, true)
 				}
 				if (this.solved) {
 					setTimeout(() => {
@@ -95,10 +124,8 @@ export class Puzzle {
 		this.solved = flag;
 	}
 
-
+	// TODO:
 	initDom() {
-		this.box.style.width = (this.partWidth + 2) * this.gridX + 'px'
-		this.box.style.height = (this.partHeight + 2) * this.gridY + 'px'
 
 	}
 
@@ -106,7 +133,7 @@ export class Puzzle {
 		return this.list.flat().find(el => el.cnt === null)
 	}
 
-	swap(loc) {
+	swap(loc, started = false) {
 		if (this.solved && !this.dirty) return
 		let empty = this.emptyLoc()
 		let cnt = loc.cnt
@@ -115,14 +142,145 @@ export class Puzzle {
 			if (el.x === loc.x && el.y === loc.y) {
 				el.cnt = null
 				el.marker = empty.marker
+				if (started) {
+					el.meta = 'from'
+				}
 			}
 			if (el.x === empty.x && el.y === empty.y) {
 				el.cnt = cnt
 				el.marker = marker
+				if (started) {
+					el.meta = 'to'
+				}
 			}
 		})
 		this.dirty && this.checkSolved()
-		this.draw()
+		this.draw(started)
+	}
+
+	draw(started = false) {
+		if (!started) {
+
+			this.clear()
+		}
+		let tile, element, from, to, inner
+		for (let i = 0; i < this.gridY; i++) {
+			for (let j = 0; j < this.gridX; j++) {
+
+				if (!started) {
+
+					tile = document.createElement('div')
+					tile.style.width = this.partWidth + 'px'
+					tile.style.height = this.partHeight + 'px'
+					tile.dataset.x = i
+					tile.dataset.y = j
+					tile.classList.add('item')
+					inner = document.createElement('div')
+					inner.classList.add('inner')
+					tile.append(inner)
+				}
+
+				element = this.list[i][j]
+
+				element.x = i
+				element.y = j
+				if (element.cnt) {
+					if (!started) {
+						inner.append(element.cnt)
+					}
+
+					if (element.meta === 'to') {
+
+						to = document.querySelector(`.item[data-x="${i}"][data-y="${j}"]`)
+					}
+
+				} else {
+					if (!started) {
+						let fill = document.createElement('div')
+						fill.style.color = 'gray'
+						inner.append(fill)
+						tile.classList.add('item-empty')
+					}
+					if (element.meta === 'from') {
+						from = document.querySelector(`.item[data-x="${i}"][data-y="${j}"]`)
+					}
+				}
+				if (!started) {
+					this.box.append(tile)
+				}
+
+			}
+		}
+		if (started && from && to) {
+			this.animate(from, to)
+		}
+
+	}
+	animate(from, to) {
+		let first = to.getBoundingClientRect()
+		let last = from.getBoundingClientRect()
+		const deltaX = first.left - last.left;
+		const deltaY = first.top - last.top;
+
+		let moved = from.querySelector('canvas')
+
+
+		requestAnimationFrame(function () {
+			from.style.zIndex = '2'
+			moved.classList.add('moved')
+			moved.style.transform = `translate(${deltaX}px, ${deltaY}px)`
+		})
+
+
+		from.addEventListener('transitionend', () => {
+			moved.classList.remove('moved')
+			moved.style = ''
+			from.style.zIndex = ''
+			this.list.flat().forEach(el => {
+				if (el.meta) {
+					delete el.meta
+				}
+
+			})
+			this.redraw()
+		});
+
+	}
+
+	redraw() {
+		this.clear()
+		let tile, element, inner
+		for (let i = 0; i < this.gridY; i++) {
+			for (let j = 0; j < this.gridX; j++) {
+
+
+				tile = document.createElement('div')
+				tile.style.width = this.partWidth + 'px'
+				tile.style.height = this.partHeight + 'px'
+				tile.dataset.x = i
+				tile.dataset.y = j
+				tile.classList.add('item')
+				inner = document.createElement('div')
+				inner.classList.add('inner')
+				tile.append(inner)
+
+				element = this.list[i][j]
+
+				element.x = i
+				element.y = j
+				if (element.cnt) {
+
+					inner.append(element.cnt)
+				} else {
+					let fill = document.createElement('div')
+					// fill.style.color = 'gray'
+					fill.classList.add('dummy')
+					// tile.append(fill)
+					tile.classList.add('item-empty')
+				}
+				this.box.append(tile)
+			}
+		}
 	}
 
 	setBoard() {
@@ -135,8 +293,9 @@ export class Puzzle {
 				let context = canvas.getContext('2d')
 				let w = this.partWidth
 				let h = this.partHeight
-				canvas.width = w
-				canvas.height = h
+				canvas.width = w - this.border * 2
+				canvas.height = h - this.border * 2
+				canvas.draggable = true
 				context.drawImage(this.image, w * j, h * i, w, h, 0, 0, w, h);
 				this.list[i][j] = {
 					x: i,
@@ -158,7 +317,7 @@ export class Puzzle {
 		this.initDom()
 		this.setBoard()
 		this.draw()
-		
+
 	}
 
 	start() {
@@ -166,32 +325,6 @@ export class Puzzle {
 		this.shuffle()
 		this.draw()
 		this.dirty = true
-	}
-
-	draw() {
-		this.clear()
-		for (let i = 0; i < this.gridY; i++) {
-			for (let j = 0; j < this.gridX; j++) {
-				let tile = document.createElement('div')
-				tile.style.width = this.partWidth + 'px'
-				tile.style.height = this.partHeight + 'px'
-				tile.dataset.x = i
-				tile.dataset.y = j
-				tile.classList.add('item')
-
-
-				this.list[i][j].x = i
-				this.list[i][j].y = j
-				if (this.list[i][j].cnt) {
-					tile.append(this.list[i][j].cnt)
-
-				} else {
-					tile.classList.add('item-empty')
-				}
-				this.box.append(tile)
-			}
-		}
-
 	}
 
 	canMove(from) {
