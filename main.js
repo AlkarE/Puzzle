@@ -2,6 +2,9 @@
 import 'cropperjs/dist/cropper.css'
 import './src/scss/main.scss'
 
+import clickSound from '/click.wav'
+import winSound from '/winSound.wav'
+
 import { Counter } from './src/js/counter.js'
 import Cropper from 'cropperjs'
 import MicroModal  from 'micromodal'
@@ -18,6 +21,10 @@ window.Pg = {
 let SVG_XLINK = "http://www.w3.org/1999/xlink"
 theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#play')
 
+let click = new Audio(), win = new Audio()
+click.src = clickSound
+win.src = winSound
+
 let cropper, cropRatio = .8;
 let game;
 let boardWidth, boardHeight;
@@ -29,6 +36,7 @@ const CREATED = 'CREATED'
 const IMAGELOADED = 'IMAGELOADED'
 const IMAGECROPPED = 'IMAGECROPPED'
 const GAMESTARTED = 'GAMESTARTED'
+const GAMERUN = 'GAMERUN'
 const GAMEPAUSED = 'GAMEPAUSED'
 const GAMEFINISHED = 'GAMEFINISHED'
 // 0 - created
@@ -206,7 +214,7 @@ function onCrop() {
 					w: image.width,
 					h: image.height
 				}
-				game = new Puzzle(image, gridX, gridY)
+				game = new Puzzle(image, gridX, gridY, 3, click)
 				Pg.game = game
 				game.init()
 				Pg.status = GAMESTARTED
@@ -242,17 +250,16 @@ function handler(action) {
 			Pg.status =  IMAGECROPPED
 			break;
 		case (IMAGECROPPED):
-			if(action === 'toggle') {
-				onCrop()	
+			(action === 'toggle') &&  onCrop()	
 				
-			}
+			
 			break;
 		case(GAMESTARTED):
 			if(action === 'toggle') {
 				start()
 				theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#pause')
 				Pg.stop.style.display = ''
-				// Pg.status = GAMEPAUSED
+				Pg.status = GAMEPAUSED
 			}
 		break;
 		case(GAMEPAUSED):
@@ -261,10 +268,10 @@ function handler(action) {
 				theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#play')
 				Pg.counter.stop()
 				mask()
-				Pg.status = 5
+				Pg.status = GAMERUN
 			}
 		break;
-		case(5):
+		case(GAMERUN):
 			if(action === 'toggle') {
 				
 				theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#pause')
@@ -273,6 +280,8 @@ function handler(action) {
 				Pg.status = GAMEPAUSED
 			}
 		break;
+		case(GAMEFINISHED):
+		break;
 
 	}
 }
@@ -280,6 +289,8 @@ function handler(action) {
 function solved() {
 	Pg.counter.stop()
 	theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#play')
+	win.play()
+	Pg.status = GAMEFINISHED
 }
 
 function control(evt) {

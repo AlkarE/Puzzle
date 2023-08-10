@@ -1,7 +1,8 @@
 export class Puzzle {
 
 	// default border width 3 
-	constructor(image, gridX, gridY, border = 3) {
+	constructor(image, gridX, gridY, border = 3, sound = null) {
+		this.click = sound
 		this.border = border
 		this.dirty = false
 		this.image = image
@@ -225,10 +226,13 @@ export class Puzzle {
 		let moved = from.querySelector('canvas')
 
 
+
 		requestAnimationFrame(function () {
 			from.style.zIndex = '2'
 			moved.classList.add('moved')
 			moved.style.transform = `translate(${deltaX}px, ${deltaY}px)`
+
+			
 		})
 
 
@@ -242,6 +246,12 @@ export class Puzzle {
 				}
 
 			})
+			
+			let click = this.click
+			if(click) {
+				click.play()
+			}
+
 			this.redraw()
 		});
 
