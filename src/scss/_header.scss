@@ -41,7 +41,7 @@
   .menu-items {
     position: absolute;
     z-index: 5;
-    padding: 20px;
+    // padding: 20px 0;
     background: var(--menu-bg-color);
     top: 45px;
     left: -5px;
@@ -49,14 +49,26 @@
     transition: transform 0.5s ease-in-out;
     list-style-type: none;
     li {
-      margin-bottom: 1rem;
+      margin-bottom: 0.4rem;
       font-size: 1rem;
       font-weight: 500;
+      white-space: nowrap;
+      border-bottom: 1px solid rgba(109, 84, 97, .7);
+      &:last-child {
+        margin-bottom: 0;
+        border-bottom: none;
+      }
       a {
         cursor: pointer;
+        display: block;
+        padding: 4px 30px;
         text-decoration: none;
         color: var(--menu-color);
-
+        transition: all .3s;
+        &:hover {
+          color: var(--menu-item-hover);
+          transform: translateX(10px);
+        }
       }
     }
   }
