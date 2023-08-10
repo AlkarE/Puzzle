@@ -51,8 +51,11 @@ export class Puzzle {
 			}
 		})
 		this.box.addEventListener('touchend', (evt) => {
-			// if (window.Pg.status !== 4) return
-			let el = evt.target.parentElement
+			let el = null
+			if(evt.target.parentElement && evt.target.parentElement.parentElement) {
+				el = evt.target.parentElement.parentElement
+			}
+			// let el = evt.target.parentElement.parentElement
 			if (el.classList.contains('item')) {
 				let from = this.findTile(+el.dataset.x, +el.dataset.y)
 
