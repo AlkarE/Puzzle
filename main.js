@@ -168,6 +168,7 @@ function initPlaybox() {
 */
 
 function navbar() {
+	document.querySelector('.menu-items').style.display = ''
 	document.getElementById('navbar-trigger').addEventListener('click', (evt) => {
 		document.querySelector('.navbar').classList.toggle('is-open')
 	})
