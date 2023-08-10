@@ -229,12 +229,15 @@ export class Puzzle {
 		let moved = from.querySelector('canvas')
 
 
+		let click = this.click
 
 		requestAnimationFrame(function () {
 			from.style.zIndex = '2'
 			moved.classList.add('moved')
 			moved.style.transform = `translate(${deltaX}px, ${deltaY}px)`
-
+			if(click) {
+				click.play()
+			}
 			
 		})
 
@@ -250,10 +253,7 @@ export class Puzzle {
 
 			})
 			
-			let click = this.click
-			if(click) {
-				click.play()
-			}
+			
 
 			this.redraw()
 		});
