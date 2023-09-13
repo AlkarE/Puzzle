@@ -10,12 +10,11 @@
 .navbar {
   position: relative;
   // width: 100%;
-  
-  &.is-open{
+
+  &.is-open {
     .menu-items {
       // display: block;
-    transform: translateX(0);
-
+      transform: translateX(0);
     }
     .line1 {
       transform: rotate(45deg);
@@ -26,7 +25,7 @@
     .line3 {
       transform: rotate(-45deg);
     }
-  } 
+  }
   .hamburger-lines {
     display: block;
     height: 28px;
@@ -48,26 +47,67 @@
     transform: translateX(-150%);
     transition: transform 0.5s ease-in-out;
     list-style-type: none;
-    li {
+    .menu-item {
+      display: flex;
+      align-items: center;
       margin-bottom: 0.4rem;
       font-size: 1rem;
       font-weight: 500;
       white-space: nowrap;
-      border-bottom: 1px solid rgba(109, 84, 97, .7);
+      border-bottom: 1px solid rgba(109, 84, 97, 0.7);
       &:last-child {
         margin-bottom: 0;
         border-bottom: none;
       }
-      a {
+      .menu-item-link {
         cursor: pointer;
         display: block;
         padding: 4px 30px;
         text-decoration: none;
         color: var(--menu-color);
-        transition: all .3s;
+        transition: all 0.3s;
         &:hover {
           color: var(--menu-item-hover);
           transform: translateX(10px);
+        }
+      }
+    }
+    .dropdown {
+      position: relative;
+    }
+    .dropdown:hover .sub-menu {
+      display: block;
+      // position: absolute;
+    }
+
+    .sub-menu {
+      list-style-type: none;
+      position: absolute;
+      left: 80%;
+      top: 20px;
+      display: none;
+      background-color: #fff;
+      z-index: 10;
+      font-size: 0;
+      li {
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+        a {
+          cursor: pointer;
+          font-size: 0.9rem;
+          font-weight: 500;
+          white-space: nowrap;
+          display: flex;
+          padding: 4px 30px;
+          text-decoration: none;
+          color: var(--menu-color);
+          transition: all 0.3s;
+          &:hover,
+          &.selected {
+            background-color: #eee;
+          }
         }
       }
     }
@@ -78,8 +118,11 @@
     align-items: center;
     height: 100%;
   }
+  .ionicon {
+    width: 24px;
+    height: 24px;
+  }
 }
-
 
 .hamburger-lines {
   .line {
@@ -105,7 +148,7 @@ h1.logo {
   text-transform: uppercase;
   color: var(--accent-color);
   font-size: 3rem;
-} 
+}
 .logo {
   will-change: filter;
   transition: filter 300ms;

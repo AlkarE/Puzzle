@@ -201,7 +201,7 @@ function onCrop() {
 
 	// document.querySelector('.image-area img').style.display = 'none'
 	document.querySelector('.image-area').style.display = 'none'
-	canvas.toBlob(function (blob) {
+	canvas.toBlob( (blob) => {
 		const reader = new FileReader();
 		reader.readAsDataURL(blob);
 		reader.onload = function () {
@@ -221,7 +221,7 @@ function onCrop() {
 				Pg.status = GAMESTARTED
 			}
 		};
-	});
+	},'image/jpeg');
 
 }
 
@@ -294,6 +294,13 @@ function solved() {
 	Pg.status = GAMEFINISHED
 }
 
+function menuHandler(evt) {
+	
+	evt.preventDefault();
+	const action = evt.target.dataset?.target ?? ''
+	log(action)
+}
+
 function control(evt) {
 	if(evt.target.id === 'control') return
 	let el = (evt.target).closest('button.btn')
@@ -316,6 +323,11 @@ function eventFiller() {
 	document.getElementById('playBox').addEventListener('mousedown', (evt) => {
 		// log(evt)
 	})
+
+	// menu
+	document.getElementById('app-menu').addEventListener('click', menuHandler)
+
+
 	document.addEventListener('click', (evt) => {
 
 		if(evt.id === 'masked') {
