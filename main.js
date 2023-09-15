@@ -11,6 +11,10 @@ import MicroModal  from 'micromodal'
 // import * as localStore from '@zellwk/javascript/browser/local-store.js'
 import { Puzzle } from './src/js/puzzle.js'
 import { bodyHeight, bodyWidth, log, getElSizes } from './src/js/utils'
+
+import { toggleSubMenu } from './src/js/menu-alt'
+
+
 window.Pg = {
 	counter: new Counter(document.getElementById('counter'), { template: 'h:m:s' }),
 	toggle: document.querySelector('#control button[data-action="toggle"]'),
@@ -142,7 +146,7 @@ function initPlaybox() {
 		inner.appendChild(dummy)
 		el.style.width = item.width + 'px'
 		el.style.height = item.height + 'px'
-		board.append(el)
+		board.prepend(el)
 	}
 	// item border 3px
 	boardWidth = (item.width + 6) * gridX
@@ -234,6 +238,13 @@ function init() {
 	MicroModal .init({
 		openTrigger: 'data-custom-open',
 	});
+
+	initSubMenu()
+}
+
+function initSubMenu() {
+	const dropdowns = document.querySelectorAll('.dropdown')
+	Array.from(dropdowns).forEach(el => toggleSubMenu(el))
 }
 
 
@@ -298,7 +309,30 @@ function menuHandler(evt) {
 	
 	evt.preventDefault();
 	const action = evt.target.dataset?.target ?? ''
-	log(action)
+	// log(action)
+	switch(action) {
+		case 'open':
+			document.getElementById('fileInput').click()
+			break;
+		case 'continue':
+			break;
+		case 'share':
+			break;
+		case 'toggle-timer':
+			break;
+		case 'save':
+			break;
+		case 'russian':
+			break;
+		case 'english':
+			break;
+		case 'beginer':
+			break;
+		case 'medium':
+			break;
+		case 'expert':
+			break;
+	}
 }
 
 function control(evt) {

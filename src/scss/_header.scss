@@ -40,6 +40,7 @@
   .menu-items {
     position: absolute;
     z-index: 5;
+    width: 220px;
     // padding: 20px 0;
     background: var(--menu-bg-color);
     top: 45px;
@@ -59,6 +60,11 @@
         margin-bottom: 0;
         border-bottom: none;
       }
+      &:hover > .menu-item-link,
+      &:hover > .language-picker {
+        color: var(--menu-item-hover);
+        // transform: translateX(10px);
+      }
       .menu-item-link {
         cursor: pointer;
         display: block;
@@ -66,31 +72,29 @@
         text-decoration: none;
         color: var(--menu-color);
         transition: all 0.3s;
-        &:hover {
-          color: var(--menu-item-hover);
-          transform: translateX(10px);
-        }
       }
     }
     .dropdown {
       position: relative;
     }
-    .dropdown:hover .sub-menu {
-      display: block;
-      // position: absolute;
-    }
+    // .dropdown:hover .sub-menu {
+    //   display: block;
+    //   // position: absolute;
+    // }
 
     .sub-menu {
       list-style-type: none;
       position: absolute;
-      left: 80%;
-      top: 20px;
+      width: 180px;
+      left: 40%;
+      top: 30px;
       display: none;
       background-color: #fff;
       z-index: 10;
-      font-size: 0;
+      &.is-open {
+        display: block;
+      }
       li {
-
         &:last-child {
           margin-bottom: 0;
         }
@@ -104,9 +108,20 @@
           text-decoration: none;
           color: var(--menu-color);
           transition: all 0.3s;
-          &:hover,
+          &:hover {
+            background-color: #eee;
+          }
           &.selected {
             background-color: #eee;
+            &::after {
+              content: '';
+              height: 16px;
+              width: 16px;
+              background-color: currentColor;
+              -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpolyline stroke-width='2' stroke='%23ffffff' fill='none' stroke-linecap='round' stroke-linejoin='round' points='1,9 5,13 15,3 '/%3E%3C/svg%3E");
+              mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpolyline stroke-width='2' stroke='%23ffffff' fill='none' stroke-linecap='round' stroke-linejoin='round' points='1,9 5,13 15,3 '/%3E%3C/svg%3E");
+              margin-left: auto;
+            }
           }
         }
       }
@@ -118,9 +133,9 @@
     align-items: center;
     height: 100%;
   }
-  .ionicon {
-    width: 24px;
-    height: 24px;
+  .svg {
+    width: 16px;
+    height: 16px;
   }
 }
 
