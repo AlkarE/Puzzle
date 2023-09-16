@@ -1,27 +1,33 @@
-// import 'normalize-scss'
 import 'cropperjs/dist/cropper.css'
 import './src/scss/main.scss'
 
-import clickSound from '/click.wav'
+import clickSound from '/click_alt.wav'
 import winSound from '/winSound.wav'
 
 import { Counter } from './src/js/counter.js'
 import Cropper from 'cropperjs'
 import MicroModal  from 'micromodal'
-// import * as localStore from '@zellwk/javascript/browser/local-store.js'
+import * as localStore from '@zellwk/javascript/browser/localstore.js'
 import { Puzzle } from './src/js/puzzle.js'
 import { bodyHeight, bodyWidth, log, getElSizes } from './src/js/utils'
 
-import { toggleSubMenu } from './src/js/menu-alt'
+import { opened } from './src/js/menu-alt'
+import getThemes from './src/js/themes'
+import { dict } from './src/js/langs'
 
-
-window.Pg = {
-	counter: new Counter(document.getElementById('counter'), { template: 'h:m:s' }),
-	toggle: document.querySelector('#control button[data-action="toggle"]'),
-	stop: document.querySelector('#control button[data-action="stop"]'),
-	status: null,
-
+const themes = getThemes()
+function winObj() {
+	window.Pg = {
+		counter: new Counter(document.getElementById('counter'), { template: 'h:m:s' }),
+		toggle: document.querySelector('#control button[data-action="toggle"]'),
+		stop: document.querySelector('#control button[data-action="stop"]'),
+		status: null,
+		theme: themes[settings.theme]
+	}
 }
+
+let settings
+
 let SVG_XLINK = "http://www.w3.org/1999/xlink"
 theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#play')
 
@@ -29,10 +35,8 @@ let click = new Audio(), win = new Audio()
 click.src = clickSound
 win.src = winSound
 
-let cropper, cropRatio = .8;
-let game;
+let cropper, game
 let boardWidth, boardHeight;
-let gridX = 3, gridY = 4
 
 
 // statuses:
@@ -52,6 +56,7 @@ const GAMEFINISHED = 'GAMEFINISHED'
 
 
 function loadImage() {
+	log('loaded')
 	// load the uploaded image
 	let fileInput = document.getElementById("fileInput");
 	let file = fileInput.files[0];
@@ -62,6 +67,7 @@ function loadImage() {
 		let img = document.getElementById('image-src');
 		img.src = reader.result;
 		img.onload = function () {
+			showCropArea()
 			hideLoader()
 			cropper = new Cropper(img, {
 				dragMode: 'move',
@@ -90,38 +96,28 @@ function hideLoader() {
 	document.getElementById('imgLoader').style.display = 'none'
 }
 
-function getColor(parts, i) {
+function showLoader() {
+	document.getElementById('imgLoader').style.display = ''
+}
 
-	/* 
-	* 
-	#0469ED
-	#0059CD
-	#0051BA
-	#004CAD
-	#0047A1
-	
-	*/ 
+function showCropArea() {
+	document.querySelector('.image-area').style.zIndex = '5'
+}
+
+function getColor(i) {
 	let prefix = '#'
-	let start = 0x0469ED
-	let end = 0x003270
-	let diff = start - end
-	let step = (Math.floor(diff / parts))
-	let color = (start + step * i).toString(16)
-	while(color.length < 6) {
-		color = '0' + color
-	}
-	color = prefix + color
-	return color
+	const dashboardColors = window.Pg.theme.partsColor
+	return prefix + dashboardColors[i]
 }
 
 
-function initPlaybox() {
+function initPlaybox(options) {
 	// counter/header height 32
 	// footer height 40
-	let startColor = 0x0469ED
 	const safeHeight = 40 + 32 + 120
-	// aspectRatio = gridX / gridY
 	const board = document.getElementById('playBox')
+
+	const uploadBox = document.getElementById('imgLoader')
 	let requiredHeight = bodyHeight - safeHeight
 	let requiredWidth = 600
 	if (bodyWidth <= 600) {
@@ -129,11 +125,11 @@ function initPlaybox() {
 	}
 	
 	const item = {
-		height: Math.floor(requiredHeight / gridY),
-		width: Math.floor(requiredWidth / gridX)
+		height: Math.floor(requiredHeight / options.gridY),
+		width: Math.floor(requiredWidth / options.gridX)
 	}
 
-	for (let i = 0; i < gridX * gridY; i++) {
+	for (let i = 0; i < options.gridX * options.gridY; i++) {
 		let el = document.createElement('div')
 		let inner = document.createElement('div')
 		inner.classList.add('inner')
@@ -142,15 +138,17 @@ function initPlaybox() {
 		el.classList.add('item')
 		let dummy = document.createElement('div')
 		dummy.classList.add('fill')
-		dummy.style.background = getColor(gridX * gridY, i)
+		dummy.style.background = getColor(i)
 		inner.appendChild(dummy)
 		el.style.width = item.width + 'px'
 		el.style.height = item.height + 'px'
-		board.prepend(el)
+		board.append(el)
 	}
+
+	board.append(uploadBox)
 	// item border 3px
-	boardWidth = (item.width + 6) * gridX
-	boardHeight = (item.height + 6) * gridY
+	boardWidth = (item.width + 6) * options.gridX
+	boardHeight = (item.height + 6) * options.gridY
 
 	Pg.w = boardWidth
 	Pg.h = boardHeight
@@ -159,9 +157,8 @@ function initPlaybox() {
 	board.style.width = boardWidth + 'px'
 
 	Pg.status = CREATED
+	showLoader()
 }
-
-
 /**
  * user
  * users pictures
@@ -178,25 +175,23 @@ function navbar() {
 	})
 }
 
-function mask() {
-	let layer = document.createElement('div')
-	layer.id= 'masked'
-	layer.classList.add('masked')
-	document.querySelector('#playBox').append(layer)
+function initMenus(options) {
+	const menuIds = ['level', 'lang', 'theme'];
+	menuIds.forEach(menuId => {
+		let menuEl = document.getElementById(menuId)
+		let items = menuEl.querySelectorAll('.sub-menu-link')
+		Array.from(items).forEach(item => {
+			let selected = options[menuId]
+			if(item.dataset.target === selected) {
+				item.classList.add('selected')
+			}
+		})
+	})
 }
 
-function unmask() {
-	let mask = document.getElementById('masked')
-	if(mask) {
-		mask.remove()
-	}
-}
 
-function loadLocal() {
 
-}
-
-function onCrop() {
+function onCrop(options) {
 	let canvas = cropper.getCroppedCanvas({
 		maxWidth: boardWidth,
 		width: boardWidth,
@@ -219,7 +214,7 @@ function onCrop() {
 					w: image.width,
 					h: image.height
 				}
-				game = new Puzzle(image, gridX, gridY, 3, click)
+				game = new Puzzle(image, options.gridX, options.gridY, 3, click)
 				Pg.game = game
 				game.init()
 				Pg.status = GAMESTARTED
@@ -229,22 +224,47 @@ function onCrop() {
 
 }
 
-function init() {
+function applyLang(lang) {
+	const dictionary = dict[settings.lang]
+	const links = document.querySelectorAll('a')
+	Array.from(links).forEach(link => {
+		let key = link.dataset?.lang ?? ''
+		if(key) {
+			link.innerText = dictionary[key]
+		}
+	})
+}
 
+function saveSettings() {
+	localStore.set('settings',settings)
+}
+
+function init(bool) {
+	const defaults = {
+		level: '3x4',
+		theme: 'green',
+		gridX: 3,
+		gridY: 4,
+		lang: 'en'
+	}
+	const savedSettings = localStore.get('settings')
+	if(savedSettings) {
+		settings = savedSettings
+	} else {
+		settings = defaults
+	}
+	winObj()
 	navbar()
+	applyLang(settings.lang)
+	initMenus(settings)
 	eventFiller()
-	initPlaybox()
+	initPlaybox(settings)
 	handler()
 	MicroModal .init({
 		openTrigger: 'data-custom-open',
 	});
-
-	initSubMenu()
-}
-
-function initSubMenu() {
-	const dropdowns = document.querySelectorAll('.dropdown')
-	Array.from(dropdowns).forEach(el => toggleSubMenu(el))
+	// initSubMenu()
+	saveSettings()
 }
 
 
@@ -262,7 +282,7 @@ function handler(action) {
 			Pg.status =  IMAGECROPPED
 			break;
 		case (IMAGECROPPED):
-			(action === 'toggle') &&  onCrop()	
+			(action === 'toggle') &&  onCrop(settings)	
 				
 			
 			break;
@@ -279,7 +299,6 @@ function handler(action) {
 				
 				theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#play')
 				Pg.counter.stop()
-				mask()
 				Pg.status = GAMERUN
 			}
 		break;
@@ -288,7 +307,6 @@ function handler(action) {
 				
 				theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#pause')
 				Pg.counter.run()
-				unmask()
 				Pg.status = GAMEPAUSED
 			}
 		break;
@@ -305,11 +323,37 @@ function solved() {
 	Pg.status = GAMEFINISHED
 }
 
+function applyGrid(gridX,gridY) {
+	settings.gridX = gridX
+	settings.gridY = gridY
+	settings.level = gridX + 'x' + gridY
+	saveSettings()
+	window.location.reload()
+}
+
+function applyTheme(theme) {
+	settings.theme = theme
+	saveSettings()
+	window.location.reload()
+}
+
+function resetGame() {
+	game = null
+	Pg.status = null
+	Pg.toggle.style.display = 'none'
+	document.getElementById('imgLoader').style.display = ''
+	const imageArea = document.querySelector('.image-area')
+	imageArea.innerHTML = ''
+	imageArea.insertAdjacentHTML('afterbegin', '<img src="" id="image-src" />')
+	const items = document.querySelectorAll('.item')
+	Array.from(items).forEach(item => item.remove())
+}
+
 function menuHandler(evt) {
 	
 	evt.preventDefault();
 	const action = evt.target.dataset?.target ?? ''
-	// log(action)
+	log(action)
 	switch(action) {
 		case 'open':
 			document.getElementById('fileInput').click()
@@ -322,15 +366,36 @@ function menuHandler(evt) {
 			break;
 		case 'save':
 			break;
-		case 'russian':
+		case 'ru':
+			settings.lang = 'ru'
+			saveSettings()
+			window.location.reload()
 			break;
-		case 'english':
+		case 'en':
+			settings.lang = 'en'
+			saveSettings()
+			window.location.reload()
 			break;
-		case 'beginer':
+		case '3x2':
+			applyGrid(3,2)
 			break;
-		case 'medium':
+		case '3x3':
+			applyGrid(3,3)
 			break;
-		case 'expert':
+		case '3x4':
+			applyGrid(3,4)
+			break;
+		case 'red':
+			applyTheme('red')
+			break;
+		case 'blue':
+			applyTheme('blue')
+			break;
+		case 'green':
+			applyTheme('green')
+			break;
+		case 'violet':
+			applyTheme('violet')
 			break;
 	}
 }
@@ -360,14 +425,6 @@ function eventFiller() {
 
 	// menu
 	document.getElementById('app-menu').addEventListener('click', menuHandler)
-
-
-	document.addEventListener('click', (evt) => {
-
-		if(evt.id === 'masked') {
-			return
-		}
-	})
 
 }
 

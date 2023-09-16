@@ -22,36 +22,38 @@
 
 
           <ul class="menu-items" id="app-menu" style="display: none;">
-            <li class="menu-item"><a href="#" class="menu-item-link" data-target="open">Open</a></li>
-            <li class="menu-item"><a class="menu-item-link" href="#" data-target="continue">Continue</a></li>
-            <li class="menu-item"><a class="menu-item-link" href="#" data-target="share">Share</a></li>
+            <li class="menu-item"><a href="#" data-lang="open" class="menu-item-link" data-target="open">Open</a></li>
+            <li class="menu-item"><a class="menu-item-link" data-lang="continue" href="#" data-target="continue">Continue</a></li>
+            <li class="menu-item"><a class="menu-item-link" data-lang="share" href="#" data-target="share">Share</a></li>
             <li class="menu-item dropdown">
-              <a class="menu-item-link" href="#">Level</a>
+              <a class="menu-item-link" data-lang="level" href="#">Level</a>
               <svg viewBox="0 0 16 16" class="svg"><polygon points="3,5 8,11 13,5 "></polygon></svg>
-              <ul class="sub-menu">
-                <li><a href="#"  class="sub-menu-link" data-target="level3x2">3x2</a></li>
-                <li><a href="#" class="sub-menu-link" data-target="level3x3">3x3</a></li>
-                <li><a href="#" class="selected sub-menu-link" data-target="level3x4">3x4</a></li>
+              <ul class="sub-menu" id="level">
+                <li><a href="#"  class="sub-menu-link" data-target="3x2">3x2</a></li>
+                <li><a href="#" class="sub-menu-link" data-target="3x3">3x3</a></li>
+                <li><a href="#" class="sub-menu-link" data-target="3x4">3x4</a></li>
               </ul>
             </li>
-            <li class="menu-item"><a class="menu-item-link" href="#" data-target="toggle-timer">Timer on/off</a></li>
+            <li class="menu-item"><a class="menu-item-link" data-lang="timer" href="#" data-target="toggle-timer">Timer on/off</a></li>
             <li class="menu-item dropdown">
-              <a class="menu-item-link" href="#">Language</a>
+              <a class="menu-item-link" data-lang="language" href="#">Language</a>
               <svg viewBox="0 0 16 16" class="svg"><polygon points="3,5 8,11 13,5 "></polygon></svg>
-              <ul class="sub-menu">
-                <li><a href="#"  class="sub-menu-link" data-target="ru">Russian</a></li>
-                <li><a href="#" class="selected sub-menu-link" data-target="en">English</a></li>
+              <ul class="sub-menu" id="lang">
+                <li><a href="#"  class="sub-menu-link" data-lang="ru" data-target="ru">Russian</a></li>
+                <li><a href="#" class="sub-menu-link" data-lang="en" data-target="en">English</a></li>
               </ul>
             </li>
             <li class="menu-item dropdown">
-              <a class="menu-item-link" href="#">Theme</a>
+              <a class="menu-item-link" data-lang="theme" href="#">Theme</a>
               <svg viewBox="0 0 16 16" class="svg"><polygon points="3,5 8,11 13,5 "></polygon></svg>
-              <ul class="sub-menu">
-                <li><a href="#"  class="sub-menu-link" data-target="ru">Russian</a></li>
-                <li><a href="#" class="selected sub-menu-link" data-target="en">English</a></li>
+              <ul class="sub-menu" id="theme">
+                <li><a href="#"  class="sub-menu-link" data-lang="red" data-target="red">Red</a></li>
+                <li><a href="#" class="sub-menu-link" data-lang="green" data-target="green">Green</a></li>
+                <li><a href="#" class="sub-menu-link" data-lang="violet" data-target="violet">Violet</a></li>
+                <li><a href="#" class="sub-menu-link" data-lang="blue" data-target="blue">Blue</a></li>
               </ul>
             </li>
-            <li class="menu-item"><a class="menu-item-link" href="#" data-target="save">Save</a></li>
+            <li class="menu-item"><a class="menu-item-link" data-lang="save" href="#" data-target="save">Save</a></li>
           </ul>
         </nav>
 
@@ -81,7 +83,7 @@
           <img src="" id="image-src" alt="">
         </div>
         <div id="playBox" class="playbox bg">
-          <div class="box" id="imgLoader">
+          <div class="box" id="imgLoader" style="display: none;">
             <input type="file" name="fileInput" id="fileInput" class="inputfile"
               accept="image/png, image/jpeg, image/jpg" />
             <label for="fileInput">
