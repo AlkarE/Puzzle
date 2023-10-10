@@ -1,7 +1,7 @@
 import 'cropperjs/dist/cropper.css'
 import './src/scss/main.scss'
 
-import clickSound from '/click_alt.wav'
+import clickSound from '/cl.wav'
 import winSound from '/winSound.wav'
 
 import { Counter } from './src/js/counter.js'
@@ -21,8 +21,10 @@ function winObj() {
 		counter: new Counter(document.getElementById('counter'), { template: 'h:m:s' }),
 		toggle: document.querySelector('#control button[data-action="toggle"]'),
 		stop: document.querySelector('#control button[data-action="stop"]'),
+		mask: document.getElementById('mask'),
 		status: null,
-		theme: themes[settings.theme]
+		theme: themes[settings.theme],
+		menuOpened: false
 	}
 }
 
@@ -53,6 +55,7 @@ const GAMEFINISHED = 'GAMEFINISHED'
 // 3 - game started
 // 4 - game paused
 // 5 - game finished
+
 
 
 function loadImage() {
@@ -90,6 +93,13 @@ function loadImage() {
 function start() {
 	game.start()
 	Pg.counter.run()
+}
+
+function hideMask() {
+	Pg.mask.style.display= 'none'
+}
+function showMask() {
+	Pg.mask.style.display = ''
 }
 
 function hideLoader() {
@@ -172,6 +182,8 @@ function navbar() {
 	document.querySelector('.menu-items').style.display = ''
 	document.getElementById('navbar-trigger').addEventListener('click', (evt) => {
 		document.querySelector('.navbar').classList.toggle('is-open')
+
+		Pg.menuOpened = !Pg.menuOpened
 	})
 }
 
@@ -253,6 +265,7 @@ function init(bool) {
 	} else {
 		settings = defaults
 	}
+	setTheme(settings.theme)
 	winObj()
 	navbar()
 	applyLang(settings.lang)
@@ -273,17 +286,20 @@ function handler(action) {
 	log('status: ', Pg.status)
 	switch (Pg.status) {
 		case (CREATED):
-			let btns = document.querySelectorAll('#control button')
-			Array.from(btns).forEach(btn => btn.style.display = 'none')
+			// let btns = document.querySelectorAll('#control button')
+			// Array.from(btns).forEach(btn => btn.style.display = 'none')
 			break;
 
 		case (IMAGELOADED):
 			Pg.toggle.style.display = ''
 			Pg.status =  IMAGECROPPED
+			// show play/pause button
+			let middleBtn = document.getElementById('desktop-control')
+			middleBtn.style.display = ''
 			break;
 		case (IMAGECROPPED):
 			(action === 'toggle') &&  onCrop(settings)	
-				
+			
 			
 			break;
 		case(GAMESTARTED):
@@ -299,6 +315,7 @@ function handler(action) {
 				
 				theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#play')
 				Pg.counter.stop()
+				showMask()
 				Pg.status = GAMERUN
 			}
 		break;
@@ -307,6 +324,7 @@ function handler(action) {
 				
 				theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#pause')
 				Pg.counter.run()
+				hideMask()
 				Pg.status = GAMEPAUSED
 			}
 		break;
@@ -334,7 +352,25 @@ function applyGrid(gridX,gridY) {
 function applyTheme(theme) {
 	settings.theme = theme
 	saveSettings()
+	
 	window.location.reload()
+}
+
+function setTheme(theme) {
+	const activeTheme = themes[theme]
+	const r = document.querySelector(':root');
+
+	r.style.setProperty("--theme-frame1-color", `#${activeTheme.border1}`);
+	r.style.setProperty("--theme-frame2-color", `#${activeTheme.border2}`);
+	r.style.setProperty("--theme-frame3-color", `#${activeTheme.border3}`);
+
+	r.style.setProperty("--theme-btn-out-start", `#${activeTheme.btn.outerColorStart}`);
+	r.style.setProperty("--theme-btn-out-end", `#${activeTheme.btn.outerColorEnd}`);
+	r.style.setProperty("--theme-btn-in-start", `#${activeTheme.btn.innerColorStart}`);
+	r.style.setProperty("--theme-btn-in-end", `#${activeTheme.btn.innerColorEnd}`);
+
+	r.style.setProperty("--theme-btn-border", `#${activeTheme.btn.border}`);
+	r.style.setProperty("--theme-btn-icon", `#${activeTheme.btn.icon}`);
 }
 
 function resetGame() {
@@ -401,11 +437,12 @@ function menuHandler(evt) {
 }
 
 function control(evt) {
-	if(evt.target.id === 'control') return
-	let el = (evt.target).closest('button.btn')
-	if (!el.dataset || el.dataset.action == '') return
-
-	handler(evt.target.parentElement.parentElement.dataset.action)
+	let evtEl = evt.target
+	let el = (evtEl).closest('button.btn')
+	if (el && el.dataset && el.dataset.action !== '') {
+		let action = el.dataset.action
+		handler(action)
+	}
 }
 
 function eventFiller() {
@@ -425,6 +462,14 @@ function eventFiller() {
 
 	// menu
 	document.getElementById('app-menu').addEventListener('click', menuHandler)
+	document.addEventListener('click', (evt) => {
+		let el = evt.target
+		let trigger = el.closest('#navbar-trigger') ? true : el.closest('#app-menu') ? true : false
+		if(Pg.menuOpened && !trigger) {
+			document.querySelector('.navbar').classList.toggle('is-open')
+			Pg.menuOpened = !Pg.menuOpened
+		}
+	})
 
 }
 
