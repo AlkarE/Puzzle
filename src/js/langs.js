@@ -26,7 +26,7 @@ export const dict = {
     save: 'Сохранить',
     red: 'Красный',
     blue: 'Синий',
-    green: 'Зеленй',
+    green: 'Зеленый',
     violet: 'Фиолетовый',
     ru: 'Русский',
     en: 'English'
