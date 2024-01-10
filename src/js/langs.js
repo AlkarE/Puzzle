@@ -1,5 +1,6 @@
 export const dict = {
   en: {
+    info: 'Information',
     open: 'Open',
     continue: 'Continue',
     share: 'Share',
@@ -7,7 +8,7 @@ export const dict = {
     timer: 'Timer on/off',
     language: 'Language',
     theme: 'Theme',
-    save: 'Save',
+    save: 'Save and close',
     red: 'Red',
     blue: 'Blue',
     green: 'Green',
@@ -16,6 +17,7 @@ export const dict = {
     en: 'English'
   },
   ru: {
+    info: 'Информация',
     open: 'Открыть',
     continue: 'Продолжить',
     share: 'Поделиться',
@@ -23,7 +25,7 @@ export const dict = {
     timer: 'Таймер вкл/выкл',
     language: 'Язык',
     theme: 'Тема',
-    save: 'Сохранить',
+    save: 'Закрыть и сохранить',
     red: 'Красный',
     blue: 'Синий',
     green: 'Зеленый',
