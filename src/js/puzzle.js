@@ -13,8 +13,8 @@ export class Puzzle {
 		this.solved = false
 		this.width = image.width
 		this.height = image.height
-		this.partWidth = Math.floor(this.width / this.gridX) 
-		this.partHeight = Math.floor(this.height / this.gridY) 
+		this.partWidth = Math.floor(this.width / this.gridX)
+		this.partHeight = Math.floor(this.height / this.gridY)
 		this.box = document.getElementById("playBox")
 		this.listener()
 		window.Pg.list = this.list
@@ -50,9 +50,37 @@ export class Puzzle {
 				}
 			}
 		})
+		this.box.addEventListener('mousedown', evt => {
+			let el = null, from = null
+
+			if (evt.target.parentElement && evt.target.parentElement.parentElement) {
+				el = evt.target.parentElement.parentElement
+			}
+			if (el.classList.contains('item')) {
+				from = this.findTile(+el.dataset.x, +el.dataset.y)
+				const onMove = () => {
+					this.swap(from, true)
+				}
+				el.onmouseup = function () {
+					console.log('mouseup')
+					el.removeEventListener('mousemove', onMove);
+				}
+
+				if (this.canMove(from)) {
+					el.addEventListener('mousemove', onMove)
+
+				}
+			}
+
+		})
+
+
+		// this.box.ondragstart = function (evt) {
+		// 	return false
+		// }
 		this.box.addEventListener('touchend', (evt) => {
 			let el = null
-			if(evt.target.parentElement && evt.target.parentElement.parentElement) {
+			if (evt.target.parentElement && evt.target.parentElement.parentElement) {
 				el = evt.target.parentElement.parentElement
 			}
 			// let el = evt.target.parentElement.parentElement
@@ -235,10 +263,10 @@ export class Puzzle {
 			from.style.zIndex = '2'
 			moved.classList.add('moved')
 			moved.style.transform = `translate(${deltaX}px, ${deltaY}px)`
-			if(click) {
+			if (click) {
 				click.play()
 			}
-			
+
 		})
 
 
@@ -252,8 +280,8 @@ export class Puzzle {
 				}
 
 			})
-			
-			
+
+
 
 			this.redraw()
 		});
