@@ -6,7 +6,7 @@ import winSound from '/winSound.wav'
 
 import { Counter } from './src/js/counter.js'
 import Cropper from 'cropperjs'
-import MicroModal  from 'micromodal'
+import MicroModal from 'micromodal'
 import * as localStore from '@zellwk/javascript/browser/localstore.js'
 import { Puzzle } from './src/js/puzzle.js'
 import { bodyHeight, bodyWidth, log, getElSizes } from './src/js/utils'
@@ -21,11 +21,15 @@ function winObj() {
 		counter: new Counter(document.getElementById('counter'), { template: 'h:m:s' }),
 		toggle: document.querySelector('#control button[data-action="toggle"]'),
 		stop: document.querySelector('#control button[data-action="stop"]'),
-		mask: document.getElementById('mask'),
+		mask: '<div class="backdrop" id="mask"></div>',
 		status: null,
 		theme: themes[settings.theme],
-		menuOpened: false
+		menuOpened: false,
+		click: new Audio(),
+		win: new Audio()
 	}
+	Pg.click.src = clickSound
+	Pg.win.src = winSound
 }
 
 let settings
@@ -33,9 +37,9 @@ let settings
 let SVG_XLINK = "http://www.w3.org/1999/xlink"
 theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#play')
 
-let click = new Audio(), win = new Audio()
-click.src = clickSound
-win.src = winSound
+// let click = new Audio(), win = new Audio()
+// click.src = clickSound
+// win.src = winSound
 
 let cropper, game
 let boardWidth, boardHeight;
@@ -96,10 +100,10 @@ function start() {
 }
 
 function hideMask() {
-	Pg.mask.style.display= 'none'
+	document.querySelector('#mask').remove()
 }
 function showMask() {
-	Pg.mask.style.display = ''
+	document.querySelector('#playBox').insertAdjacentHTML('beforeend', Pg.mask)
 }
 
 function hideLoader() {
@@ -122,9 +126,9 @@ function getColor(i) {
 
 
 function initPlaybox(options) {
-	// counter/header height 32
+	// counter/header height 85
 	// footer height 40
-	const safeHeight = 40 + 32 + 120
+	const safeHeight = 40 + 85 + 120
 	const board = document.getElementById('playBox')
 
 	const uploadBox = document.getElementById('imgLoader')
@@ -133,7 +137,7 @@ function initPlaybox(options) {
 	if (bodyWidth <= 600) {
 		requiredWidth = bodyWidth - 32
 	}
-	
+
 	const item = {
 		height: Math.floor(requiredHeight / options.gridY),
 		width: Math.floor(requiredWidth / options.gridX)
@@ -194,11 +198,26 @@ function initMenus(options) {
 		let items = menuEl.querySelectorAll('.sub-menu-link')
 		Array.from(items).forEach(item => {
 			let selected = options[menuId]
-			if(item.dataset.target === selected) {
+			if (item.dataset.target === selected) {
 				item.classList.add('selected')
 			}
 		})
 	})
+}
+function initSound(settings) {
+	const soundFull = document.querySelector('.sound-full')
+	const soundMute = document.querySelector('.sound-mute')
+	if (settings.soundMuted) {
+		Pg.click.muted = true
+		Pg.win.muted = true
+		soundFull.style.display = 'none'
+		soundMute.style.display = ''
+	} else {
+		soundFull.style.display = ''
+		soundMute.style.display = 'none'
+		Pg.click.muted = false
+		Pg.win.muted = false
+	}
 }
 
 
@@ -212,7 +231,7 @@ function onCrop(options) {
 
 	// document.querySelector('.image-area img').style.display = 'none'
 	document.querySelector('.image-area').style.display = 'none'
-	canvas.toBlob( (blob) => {
+	canvas.toBlob((blob) => {
 		const reader = new FileReader();
 		reader.readAsDataURL(blob);
 		reader.onload = function () {
@@ -226,13 +245,13 @@ function onCrop(options) {
 					w: image.width,
 					h: image.height
 				}
-				game = new Puzzle(image, options.gridX, options.gridY, 3, click)
+				game = new Puzzle(image, options.gridX, options.gridY, 3, Pg.click)
 				Pg.game = game
 				game.init()
 				Pg.status = GAMESTARTED
 			}
 		};
-	},'image/jpeg');
+	}, 'image/jpeg');
 
 }
 
@@ -241,14 +260,14 @@ function applyLang(lang) {
 	const links = document.querySelectorAll('a')
 	Array.from(links).forEach(link => {
 		let key = link.dataset?.lang ?? ''
-		if(key) {
+		if (key) {
 			link.innerText = dictionary[key]
 		}
 	})
 }
 
 function saveSettings() {
-	localStore.set('settings',settings)
+	localStore.set('settings', settings)
 }
 
 function init(bool) {
@@ -257,10 +276,11 @@ function init(bool) {
 		theme: 'green',
 		gridX: 3,
 		gridY: 4,
-		lang: 'en'
+		lang: 'en',
+		soundMuted: false,
 	}
 	const savedSettings = localStore.get('settings')
-	if(savedSettings) {
+	if (savedSettings) {
 		settings = savedSettings
 	} else {
 		settings = defaults
@@ -273,17 +293,20 @@ function init(bool) {
 	eventFiller()
 	initPlaybox(settings)
 	handler()
-	MicroModal .init({
+	MicroModal.init({
 		openTrigger: 'data-custom-open',
 	});
+
+	initSound(settings)
 	// initSubMenu()
 	saveSettings()
 }
 
 
+
 function handler(action) {
 	// log('action: ', action)
-	log('status: ', Pg.status)
+	// log('status: ', Pg.status)
 	switch (Pg.status) {
 		case (CREATED):
 			// let btns = document.querySelectorAll('#control button')
@@ -292,44 +315,47 @@ function handler(action) {
 
 		case (IMAGELOADED):
 			Pg.toggle.style.display = ''
-			Pg.status =  IMAGECROPPED
+			Pg.status = IMAGECROPPED
 			// show play/pause button
 			let middleBtn = document.getElementById('desktop-control')
 			middleBtn.style.display = ''
 			break;
 		case (IMAGECROPPED):
-			(action === 'toggle') &&  onCrop(settings)	
-			
-			
+			(action === 'toggle') && onCrop(settings)
+
+
 			break;
-		case(GAMESTARTED):
-			if(action === 'toggle') {
+		case (GAMESTARTED):
+			if (action === 'toggle') {
 				start()
 				theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#pause')
+				playPauseM.setAttributeNS(SVG_XLINK, 'xlink:href', '#pause')
 				Pg.stop.style.display = ''
 				Pg.status = GAMEPAUSED
 			}
-		break;
-		case(GAMEPAUSED):
-			if(action === 'toggle') {
-				
+			break;
+		case (GAMEPAUSED):
+			if (action === 'toggle') {
+				console.log('here')
 				theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#play')
+				playPauseM.setAttributeNS(SVG_XLINK, 'xlink:href', '#play')
 				Pg.counter.stop()
 				showMask()
 				Pg.status = GAMERUN
 			}
-		break;
-		case(GAMERUN):
-			if(action === 'toggle') {
-				
+			break;
+		case (GAMERUN):
+			if (action === 'toggle') {
+
 				theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#pause')
+				playPauseM.setAttributeNS(SVG_XLINK, 'xlink:href', '#pause')
 				Pg.counter.run()
 				hideMask()
 				Pg.status = GAMEPAUSED
 			}
-		break;
-		case(GAMEFINISHED):
-		break;
+			break;
+		case (GAMEFINISHED):
+			break;
 
 	}
 }
@@ -337,11 +363,11 @@ function handler(action) {
 function solved() {
 	Pg.counter.stop()
 	theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#play')
-	win.play()
+	Pg.win.play()
 	Pg.status = GAMEFINISHED
 }
 
-function applyGrid(gridX,gridY) {
+function applyGrid(gridX, gridY) {
 	settings.gridX = gridX
 	settings.gridY = gridY
 	settings.level = gridX + 'x' + gridY
@@ -352,7 +378,7 @@ function applyGrid(gridX,gridY) {
 function applyTheme(theme) {
 	settings.theme = theme
 	saveSettings()
-	
+
 	window.location.reload()
 }
 
@@ -386,11 +412,11 @@ function resetGame() {
 }
 
 function menuHandler(evt) {
-	
+
 	evt.preventDefault();
 	const action = evt.target.dataset?.target ?? ''
 	log(action)
-	switch(action) {
+	switch (action) {
 		case 'open':
 			document.getElementById('fileInput').click()
 			break;
@@ -399,6 +425,7 @@ function menuHandler(evt) {
 		case 'share':
 			break;
 		case 'toggle-timer':
+			document.querySelector('#counter').classList.toggle('v-hidden')
 			break;
 		case 'save':
 			break;
@@ -413,13 +440,13 @@ function menuHandler(evt) {
 			window.location.reload()
 			break;
 		case '3x2':
-			applyGrid(3,2)
+			applyGrid(3, 2)
 			break;
 		case '3x3':
-			applyGrid(3,3)
+			applyGrid(3, 3)
 			break;
 		case '3x4':
-			applyGrid(3,4)
+			applyGrid(3, 4)
 			break;
 		case 'red':
 			applyTheme('red')
@@ -438,6 +465,7 @@ function menuHandler(evt) {
 
 function control(evt) {
 	let evtEl = evt.target
+	// console.log(evtEl)
 	let el = (evtEl).closest('button.btn')
 	if (el && el.dataset && el.dataset.action !== '') {
 		let action = el.dataset.action
@@ -455,21 +483,39 @@ function eventFiller() {
 		solved()
 	})
 
-	// mouse
-	document.getElementById('playBox').addEventListener('mousedown', (evt) => {
-		// log(evt)
+	document.querySelector('.sound-control').addEventListener('click', function (evt) {
+		evt.preventDefault()
+		const soundFull = this.querySelector('.sound-full')
+		const soundMute = this.querySelector('.sound-mute')
+		if (Pg.click.muted) {
+			Pg.click.muted = false
+			Pg.win.muted = false
+			soundFull.style.display = ''
+			soundMute.style.display = 'none'
+			settings.soundMuted = false
+
+		} else {
+			Pg.click.muted = true
+			Pg.win.muted = true
+			soundFull.style.display = 'none'
+			soundMute.style.display = ''
+			settings.soundMuted = true
+		}
+		saveSettings()
 	})
+
 
 	// menu
 	document.getElementById('app-menu').addEventListener('click', menuHandler)
 	document.addEventListener('click', (evt) => {
 		let el = evt.target
 		let trigger = el.closest('#navbar-trigger') ? true : el.closest('#app-menu') ? true : false
-		if(Pg.menuOpened && !trigger) {
+		if (Pg.menuOpened && !trigger) {
 			document.querySelector('.navbar').classList.toggle('is-open')
 			Pg.menuOpened = !Pg.menuOpened
 		}
 	})
+
 
 }
 
