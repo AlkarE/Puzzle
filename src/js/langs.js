@@ -1,10 +1,14 @@
 export const dict = {
   en: {
+    photo: 'Photo',
+    name: 'Puzzle',
+    title: 'Puzzle Game',
     info: 'Information',
     open: 'Open',
+    play: 'Play',
     continue: 'Continue',
     share: 'Share',
-    level: 'Level',
+    level: 'Difficulty',
     timer: 'Timer on/off',
     language: 'Language',
     theme: 'Theme',
@@ -17,11 +21,15 @@ export const dict = {
     en: 'English'
   },
   ru: {
+    photo: 'Фото', //
+    name: 'Собирайка', //
+    title: 'Игра Собирайка',
     info: 'Информация',
     open: 'Открыть',
+    play: 'Играть',
     continue: 'Продолжить',
     share: 'Поделиться',
-    level: 'Уровень',
+    level: 'Сложность',
     timer: 'Таймер вкл/выкл',
     language: 'Язык',
     theme: 'Тема',

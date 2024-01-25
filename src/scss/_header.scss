@@ -37,9 +37,31 @@
     }
     .logo-first {
       color: var(--theme-btn-icon);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      .full-logo {
+        height: 47px;
+        width: 240px;
+      }
+      .svg-btn {
+        height: 47px;
+        width: 47px;
+        position: absolute;
+      }
+      .o-play {
+        right: 97px;
+      }
+      .o-close {
+        right: 0;
+      }
     }
     .logo-second {
       color: var(--theme-frame2-color);
+    }
+    .logo-mobile {
+      justify-content: flex-end;
     }
     &__pc h2 {
       font-size: 42px;
@@ -49,6 +71,20 @@
       h2 {
         font-size: 53px;
       }
+    }
+  }
+  .navbar-header__mobile {
+    .btn {
+      position: absolute;
+      height: 47px;
+      width: 47px;
+    }
+    .crop {
+      right: 97px;
+    }
+    svg {
+      width: 100%;
+      height: 100%;
     }
   }
 
@@ -224,6 +260,7 @@ h1.logo {
   text-transform: uppercase;
   color: var(--accent-color);
   font-size: 3rem;
+  font-weight: 900;
 }
 .logo {
   will-change: filter;

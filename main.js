@@ -14,12 +14,16 @@ import { bodyHeight, bodyWidth, log, getElSizes } from './src/js/utils'
 import { opened } from './src/js/menu-alt'
 import getThemes from './src/js/themes'
 import { dict } from './src/js/langs'
+import { isMobile } from 'mobile-device-detect'
+// navbar-header__mobile
 
 const themes = getThemes()
 function winObj() {
 	window.Pg = {
 		counter: new Counter(document.getElementById('counter'), { template: 'h:m:s' }),
 		toggle: document.querySelector('#control button[data-action="toggle"]'),
+		toggleMobile: document.querySelector('.navbar-header__mobile button[data-action="toggle"]'),
+		stopMobile: document.querySelector('.navbar-header__mobile button[data-action="stop"]'),
 		stop: document.querySelector('#control button[data-action="stop"]'),
 		mask: '<div class="backdrop" id="mask"></div>',
 		status: null,
@@ -63,7 +67,7 @@ const GAMEFINISHED = 'GAMEFINISHED'
 
 
 function loadImage() {
-	log('loaded')
+	// log('loaded')
 	// load the uploaded image
 	let fileInput = document.getElementById("fileInput");
 	let file = fileInput.files[0];
@@ -128,8 +132,14 @@ function getColor(i) {
 function initPlaybox(options) {
 	// counter/header height 85
 	// footer height 40
-	const safeHeight = 40 + 85 + 120
+	let safeHeight = 40 + 85
 	const board = document.getElementById('playBox')
+	if (isMobile) {
+
+		safeHeight += 120
+	} else {
+		safeHeight += 30
+	}
 
 	const uploadBox = document.getElementById('imgLoader')
 	let requiredHeight = bodyHeight - safeHeight
@@ -257,6 +267,7 @@ function onCrop(options) {
 
 function applyLang(lang) {
 	const dictionary = dict[settings.lang]
+	//menu links
 	const links = document.querySelectorAll('a')
 	Array.from(links).forEach(link => {
 		let key = link.dataset?.lang ?? ''
@@ -264,7 +275,23 @@ function applyLang(lang) {
 			link.innerText = dictionary[key]
 		}
 	})
+	// headings h2
+	const headings = document.querySelectorAll('h2')
+	Array.from(headings).forEach(el => {
+		let key = el.dataset?.lang ?? ''
+		if (key) {
+			el.innerText = dictionary[key]
+		}
+	})
+	document.title = dictionary.title
+	document.documentElement.setAttribute('lang', settings.lang);
+	const logoMobile = document.querySelector('.navbar-header__mobile svg.full-logo')
+	const logoKey = '.full-logo-' + lang
+	const preLogoMobile = document.querySelector(logoKey)
+	logoMobile.innerHTML = ''
+	logoMobile.innerHTML = preLogoMobile.innerHTML
 }
+
 
 function saveSettings() {
 	localStore.set('settings', settings)
@@ -302,6 +329,12 @@ function init(bool) {
 	saveSettings()
 }
 
+function showMobileControl() {
+	Pg.toggleMobile.style.display = ''
+	Pg.stopMobile.style.display = ''
+	document.querySelector('.o-full-play').style.display = 'none'
+	document.querySelector('.o-full-close').style.display = 'none'
+}
 
 
 function handler(action) {
@@ -315,10 +348,12 @@ function handler(action) {
 
 		case (IMAGELOADED):
 			Pg.toggle.style.display = ''
+
 			Pg.status = IMAGECROPPED
 			// show play/pause button
 			let middleBtn = document.getElementById('desktop-control')
 			middleBtn.style.display = ''
+			showMobileControl()
 			break;
 		case (IMAGECROPPED):
 			(action === 'toggle') && onCrop(settings)
@@ -329,8 +364,9 @@ function handler(action) {
 			if (action === 'toggle') {
 				start()
 				theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#pause')
-				playPauseM.setAttributeNS(SVG_XLINK, 'xlink:href', '#pause')
+				playPauseM.setAttributeNS(SVG_XLINK, 'xlink:href', '#pauseMobile')
 				Pg.stop.style.display = ''
+				Pg.stopMobile.style.display = ''
 				Pg.status = GAMEPAUSED
 			}
 			break;
@@ -338,7 +374,7 @@ function handler(action) {
 			if (action === 'toggle') {
 				console.log('here')
 				theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#play')
-				playPauseM.setAttributeNS(SVG_XLINK, 'xlink:href', '#play')
+				playPauseM.setAttributeNS(SVG_XLINK, 'xlink:href', '#playMobile')
 				Pg.counter.stop()
 				showMask()
 				Pg.status = GAMERUN
@@ -348,7 +384,7 @@ function handler(action) {
 			if (action === 'toggle') {
 
 				theUse.setAttributeNS(SVG_XLINK, 'xlink:href', '#pause')
-				playPauseM.setAttributeNS(SVG_XLINK, 'xlink:href', '#pause')
+				playPauseM.setAttributeNS(SVG_XLINK, 'xlink:href', '#pauseMobile')
 				Pg.counter.run()
 				hideMask()
 				Pg.status = GAMEPAUSED
@@ -459,6 +495,11 @@ function menuHandler(evt) {
 			break;
 		case 'violet':
 			applyTheme('violet')
+			break;
+		case 'loaded':
+			// hide header mobile letters
+			// show header mobile buttons
+
 			break;
 	}
 }
