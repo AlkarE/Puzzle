@@ -17,6 +17,7 @@
     "@zellwk/javascript": "^4.0.0",
     "cropperjs": "^1.5.13",
     "micromodal": "^0.4.10",
+    "mobile-device-detect": "^0.4.3",
     "normalize-scss": "^7.0.1"
   }
 }
