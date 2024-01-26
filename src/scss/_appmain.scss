@@ -145,3 +145,24 @@ button {
     display: none;
   }
 }
+
+@media only screen and (orientation: portrait) {
+  #app {
+    display: block;
+  }
+  #notice {
+    display: none;
+  }
+}
+@media only screen and (orientation: landscape) {
+  #app {
+    display: none;
+  }
+  #notice {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }
+}
