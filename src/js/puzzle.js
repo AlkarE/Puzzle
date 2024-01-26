@@ -13,8 +13,8 @@ export class Puzzle {
 		this.solved = false
 		this.width = image.width
 		this.height = image.height
-		this.partWidth = Math.floor(this.width / this.gridX)
-		this.partHeight = Math.floor(this.height / this.gridY)
+		this.partWidth = Math.floor(this.width / this.gridX) - 6
+		this.partHeight = Math.floor(this.height / this.gridY) - 6
 		this.box = document.getElementById("playBox")
 		this.listener()
 		window.Pg.list = this.list
@@ -105,31 +105,6 @@ export class Puzzle {
 				}
 			}
 		})
-		// this.box.addEventListener('dragstart', (evt) => {
-		// 	if (window.Pg.status !== 4) return
-		// 	let el = evt.target.parentElement
-		// 	if (el.classList.contains('item')) {
-		// 		let from = this.findTile(+el.dataset.x, +el.dataset.y)
-
-		// 		if (this.canMove(from)) {
-		// 			this.swap(from, true)
-		// 		}
-		// 		if (this.solved) {
-		// 			setTimeout(() => {
-		// 				const win = new CustomEvent('solved', {
-		// 					detail: {
-		// 						win: true,
-		// 					},
-		// 				})
-
-		// 				this.clear()
-		// 				this.showImage()
-		// 				this.box.dispatchEvent(win)
-		// 			}, 500);
-		// 		}
-		// 	}
-		// })
-
 
 	}
 

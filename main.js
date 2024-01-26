@@ -9,7 +9,7 @@ import Cropper from 'cropperjs'
 import MicroModal from 'micromodal'
 import * as localStore from '@zellwk/javascript/browser/localstore.js'
 import { Puzzle } from './src/js/puzzle.js'
-import { bodyHeight, bodyWidth, log, getElSizes } from './src/js/utils'
+import { bodyHeight, bodyWidth, log, getElSizes, screenShot, throttle } from './src/js/utils'
 
 import { opened } from './src/js/menu-alt'
 import getThemes from './src/js/themes'
@@ -328,7 +328,12 @@ function init(bool) {
 	// initSubMenu()
 	saveSettings()
 	if (isMobile) {
-		screen.orientation.lock('portrait')
+		if (!document.body.classList.contains('is-mobile')) {
+
+			document.body.classList.add('is-mobile')
+		}
+	} else {
+		document.body.classList.remove('is-mobile')
 	}
 }
 
@@ -341,8 +346,11 @@ function showMobileControl() {
 
 
 function handler(action) {
-	// log('action: ', action)
-	// log('status: ', Pg.status)
+	log('action: ', action)
+	log('status: ', Pg.status)
+	if (action === 'stop') {
+		screenShot()
+	}
 	switch (Pg.status) {
 		case (CREATED):
 			// let btns = document.querySelectorAll('#control button')
@@ -562,7 +570,10 @@ function eventFiller() {
 
 
 }
-
+function reInit() {
+	window.location.reload()
+}
+window.addEventListener('resize', throttle(reInit, 500))
 window.addEventListener('load', init)
 
 

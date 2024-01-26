@@ -1,10 +1,10 @@
 .footer {
   z-index: 20;
-  padding: 0 var(--app-g-padding);
+  padding: 0 16px;
   position: fixed;
-  bottom: 20px;
-  left: calc(var(--app-g-padding) * 2);
-  right: calc(var(--app-g-padding) * 2);
+  bottom: 30px;
+  left: calc(var(--app-g-padding));
+  right: calc(var(--app-g-padding));
   &-logo {
     color: var(--theme-btn-icon);
     text-transform: uppercase;
@@ -17,7 +17,7 @@
   &-control {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
     z-index: 100;
 
     .sound-control {
@@ -62,6 +62,9 @@
   color: #fff;
   margin-left: 20px;
   margin-right: 20px;
+  position: relative;
+  top: 30px;
+  font-family: serif;
 }
 
 @media (max-width: $mobile) {
@@ -75,5 +78,8 @@
     &-control {
       justify-content: space-between;
     }
+  }
+  .counter {
+    top: 0;
   }
 }

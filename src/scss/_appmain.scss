@@ -1,7 +1,7 @@
 *,
 *::after,
 *::before {
-  // box-sizing: border-box;
+  box-sizing: border-box;
   padding: 0;
   margin: 0;
 }
@@ -51,14 +51,13 @@ html {
   height: 100vh;
 }
 body {
-  margin: 0;
-  background-color: var(--main-bg-color);
-  height: 100%;
+  height: 100vh;
   overflow-y: hidden;
   font-family: 'Raleway', sans-serif;
 }
 #app {
   height: 100%;
+  background-color: var(--main-bg-color);
   position: relative;
 }
 .frame {
@@ -136,6 +135,9 @@ button {
   right: 0;
   z-index: 5;
 }
+.text-center {
+  text-align: center;
+}
 
 @media (max-width: $mobile) {
   .main {
@@ -147,22 +149,27 @@ button {
 }
 
 @media only screen and (orientation: portrait) {
-  #app {
-    display: block;
-  }
-  #notice {
-    display: none;
+  .is-mobile {
+    #app {
+      display: block;
+    }
+    #loader {
+      display: none;
+    }
   }
 }
 @media only screen and (orientation: landscape) {
-  #app {
-    display: none;
-  }
-  #notice {
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
+  .is-mobile {
+    #app {
+      display: none;
+    }
+    #loader {
+      background: #000;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
   }
 }
