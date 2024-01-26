@@ -327,6 +327,9 @@ function init(bool) {
 	initSound(settings)
 	// initSubMenu()
 	saveSettings()
+	if (isMobile) {
+		screen.orientation.lock('portrait')
+	}
 }
 
 function showMobileControl() {
