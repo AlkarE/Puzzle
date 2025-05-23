@@ -348,7 +348,7 @@ function showMobileControl() {
 function handler(action) {
 	log('action: ', action)
 	log('status: ', Pg.status)
-	if (action === 'stop' && (Pg.status === GAMERUN)) {
+	if (action === 'stop' && (Pg.status === GAMEFINISHED)) {
 		screenShot()
 		setTimeout(() => reInit(), 1000)
 	}
@@ -465,8 +465,8 @@ function menuHandler(evt) {
 	const action = evt.target.dataset?.target ?? ''
 	log(action)
 	switch (action) {
-		case 'open':
-			document.getElementById('fileInput').click()
+		case 'play':
+			// document.getElementById('fileInput').click()
 			break;
 		case 'continue':
 			break;
