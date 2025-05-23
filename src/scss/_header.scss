@@ -41,6 +41,7 @@
       align-items: center;
       justify-content: center;
       position: relative;
+      text-shadow: 1px 1px 0 #000;
       .full-logo {
         height: 47px;
         width: 240px;
@@ -59,6 +60,7 @@
     }
     .logo-second {
       color: var(--theme-frame2-color);
+      text-shadow: 1px 1px 0 #000;
     }
     .logo-mobile {
       justify-content: flex-end;

@@ -348,8 +348,9 @@ function showMobileControl() {
 function handler(action) {
 	log('action: ', action)
 	log('status: ', Pg.status)
-	if (action === 'stop') {
+	if (action === 'stop' && (Pg.status === GAMERUN)) {
 		screenShot()
+		setTimeout(() => reInit(), 1000)
 	}
 	switch (Pg.status) {
 		case (CREATED):
