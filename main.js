@@ -348,10 +348,10 @@ function showMobileControl() {
 function handler(action) {
 	log('action: ', action)
 	log('status: ', Pg.status)
-	if (action === 'stop' && (Pg.status === GAMEFINISHED)) {
-		screenShot()
-		setTimeout(() => reInit(), 1000)
-	}
+	// if (action === 'stop' && (Pg.status === GAMEFINISHED)) {
+	// 	screenShot()
+	// 	setTimeout(() => reInit(), 1000)
+	// }
 	switch (Pg.status) {
 		case (CREATED):
 			// let btns = document.querySelectorAll('#control button')
@@ -368,6 +368,8 @@ function handler(action) {
 			showMobileControl()
 			break;
 		case (IMAGECROPPED):
+
+
 			(action === 'toggle') && onCrop(settings)
 
 
@@ -381,6 +383,7 @@ function handler(action) {
 				Pg.stopMobile.style.display = ''
 				Pg.status = GAMEPAUSED
 			}
+
 			break;
 		case (GAMEPAUSED):
 			if (action === 'toggle') {
@@ -390,6 +393,10 @@ function handler(action) {
 				Pg.counter.stop()
 				showMask()
 				Pg.status = GAMERUN
+			}
+			if (action === 'stop') {
+				screenShot()
+				// setTimeout(() => reInit(), 1000)
 			}
 			break;
 		case (GAMERUN):
@@ -403,6 +410,10 @@ function handler(action) {
 			}
 			break;
 		case (GAMEFINISHED):
+			if (action === 'stop') {
+				screenShot()
+				setTimeout(() => reInit(), 1000)
+			}
 			break;
 
 	}
@@ -466,7 +477,10 @@ function menuHandler(evt) {
 	log(action)
 	switch (action) {
 		case 'play':
-			// document.getElementById('fileInput').click()
+			if (Pg.status === CREATED) {
+
+				document.getElementById('fileInput').click()
+			}
 			break;
 		case 'continue':
 			break;

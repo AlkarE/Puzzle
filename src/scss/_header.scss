@@ -180,6 +180,11 @@
         color: var(--menu-color);
         transition: all 0.3s;
       }
+      &:not(.dropdown) {
+        .menu-item-link {
+          width: 100%;
+        }
+      }
     }
     .dropdown {
       position: relative;
